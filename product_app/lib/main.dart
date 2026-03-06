@@ -2,13 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'data/datasources/product_remote_datasource.dart';
 import 'data/repositories/product_repositoryimpl.dart';
-import 'presentation/pages/productpage.dart';
+import 'presentation/pages/product_page.dart';
 import 'presentation/viewmodels/productviewmodel.dart';
+import 'data/datasources/productcachedatasource.dart';
 
 void main() {
   final dio = Dio();
   final datasource = ProductRemoteDatasource(dio);
-  final repository = ProductRepositoryImpl(datasource);
+  final cache = ProductCacheDatasource();
+  final repository = ProductRepositoryImpl(datasource, cache);
   final viewModel = ProductViewModel(repository);
 
   runApp(MyApp(viewModel: viewModel));
