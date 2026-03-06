@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../models/productmodel.dart';
+import '../models/product_model.dart';
 
 class ProductRemoteDatasource {
   final Dio client;

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'data/datasources/productremotedatasource.dart';
-import 'data/repositories/productrepositoryimpl.dart';
+import 'data/datasources/product_remote_datasource.dart';
+import 'data/repositories/product_repositoryimpl.dart';
 import 'presentation/pages/productpage.dart';
 import 'presentation/viewmodels/productviewmodel.dart';
 
