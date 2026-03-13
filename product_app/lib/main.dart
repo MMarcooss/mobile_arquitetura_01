@@ -1,30 +1,29 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'data/datasources/product_remote_datasource.dart';
-import 'data/repositories/product_repositoryimpl.dart';
+import 'package:provider/provider.dart';
+import 'presentation/pages/providers/favorites_provider.dart';
 import 'presentation/pages/product_page.dart';
-import 'presentation/viewmodels/productviewmodel.dart';
-import 'data/datasources/productcachedatasource.dart';
 
 void main() {
-  final dio = Dio();
-  final datasource = ProductRemoteDatasource(dio);
-  final cache = ProductCacheDatasource();
-  final repository = ProductRepositoryImpl(datasource, cache);
-  final viewModel = ProductViewModel(repository);
-
-  runApp(MyApp(viewModel: viewModel));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final ProductViewModel viewModel;
-  const MyApp({super.key, required this.viewModel});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Product App',
-      home: ProductPage(viewModel: viewModel),
+    // ChangeNotifierProvider injeta o FavoritesProvider na árvore inteira
+    return ChangeNotifierProvider(
+      create: (_) => FavoritesProvider(),
+      child: MaterialApp(
+        title: 'Product App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const ProductPage(),
+      ),
     );
   }
 }
