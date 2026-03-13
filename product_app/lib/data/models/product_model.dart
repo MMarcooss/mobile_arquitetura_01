@@ -18,7 +18,7 @@ class ProductModel {
       title: json["title"],
       price: json["price"].toDouble(),
       image: json["image"],
-      favorite: json["favorite"],
+      favorite: false,
     );
   }
 }
