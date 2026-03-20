@@ -79,3 +79,85 @@ O processo de substituição seria:
 **O que não precisa ser alterado:** `ProductViewModel`, `ProductPage`, `ProductState`, a entidade `Product` e `Failure`. Todas essas classes dependem apenas da abstração `ProductRepository`, não da implementação concreta.
 
 Isso demonstra na prática o **Princípio da Inversão de Dependência (DIP):** módulos de alto nível (presentation, domain) não dependem de módulos de baixo nível (data). Ambos dependem de abstrações.
+
+# Atividade 07 — Navegação entre Telas com Flutter
+
+## Questionário
+
+**1. Qual era a estrutura do projeto antes da inclusão das novas telas?**
+
+O projeto tinha só uma tela, a `ProductPage`, que listava os produtos da API. Não tinha tela inicial nem tela de detalhes, e não havia nenhuma navegação.
+
+---
+
+**2. Como ficou o fluxo da aplicação após a implementação da navegação?**
+
+Ficou assim:
+
+```
+HomePage → ProductPage → ProductDetailPage
+```
+
+A tela inicial leva para a lista, e ao clicar num produto abre a tela de detalhes. De lá dá pra voltar para a lista ou direto para a tela inicial.
+
+---
+
+**3. Qual é o papel do `Navigator.push()` no projeto?**
+
+Ele abre uma nova tela por cima da atual. Usei ele duas vezes: uma para ir da `HomePage` para a `ProductPage`, e outra para ir da `ProductPage` para a `ProductDetailPage`.
+
+```dart
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (_) => const ProductPage()),
+);
+```
+
+---
+
+**4. Qual é o papel do `Navigator.pop()` no projeto?**
+
+Ele fecha a tela atual e volta para a anterior. Usei no botão "Voltar para a lista" na tela de detalhes. Também usei o `popUntil` para voltar direto à tela inicial.
+
+```dart
+Navigator.pop(context); // volta uma tela
+
+Navigator.of(context).popUntil((route) => route.isFirst); // volta para o início
+```
+
+---
+
+**5. Como os dados do produto selecionado foram enviados para a tela de detalhes?**
+
+Passei o produto pelo construtor da `ProductDetailPage` na hora de navegar:
+
+```dart
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => ProductDetailPage(product: product),
+  ),
+);
+```
+
+---
+
+**6. Por que a tela de detalhes depende das informações da tela anterior?**
+
+Porque ela não busca nada da API, só exibe o que recebe. Quem carrega os produtos é a `ProductPage`, então os dados já vêm prontos quando a tela de detalhes é aberta.
+
+---
+
+**7. Quais foram as principais mudanças feitas no projeto original?**
+
+- Criei a `HomePage` como nova tela inicial
+- Criei a `ProductDetailPage` com todas as informações do produto
+- Atualizei o `ProductModel` para incluir `description`, `category` e `rating`
+- Os cards da lista agora são clicáveis
+- O `main.dart` passou a iniciar na `HomePage`
+
+---
+
+**8. Quais dificuldades você encontrou durante a adaptação do projeto para múltiplas telas?**
+
+A maior dificuldade foi entender a diferença entre `pop()` e `popUntil()`, porque no começo eu não sabia como voltar direto para a tela inicial sem passar pela lista de novo. Também tive que atualizar vários arquivos por causa dos novos campos no modelo, o que deu alguns erros de compilação até ajustar tudo.
