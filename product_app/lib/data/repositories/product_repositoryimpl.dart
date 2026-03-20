@@ -8,6 +8,7 @@ class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDatasource remote;
   final ProductCacheDatasource cache;
   ProductRepositoryImpl(this.remote, this.cache);
+
   @override
   Future<List<Product>> getProducts() async {
     try {
@@ -20,6 +21,10 @@ class ProductRepositoryImpl implements ProductRepository {
               title: m.title,
               price: m.price,
               image: m.image,
+              description: m.description,
+              category: m.category,
+              ratingRate: m.ratingRate,
+              ratingCount: m.ratingCount,
             ),
           )
           .toList();
@@ -33,11 +38,15 @@ class ProductRepositoryImpl implements ProductRepository {
                 title: m.title,
                 price: m.price,
                 image: m.image,
+                description: m.description,
+                category: m.category,
+                ratingRate: m.ratingRate,
+                ratingCount: m.ratingCount,
               ),
             )
             .toList();
       }
-      throw Failure("N o foi poss vel carregar os produtos");
+      throw Failure("Não foi possível carregar os produtos");
     }
   }
 }

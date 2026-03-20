@@ -24,7 +24,7 @@ class FavoritesProvider extends ChangeNotifier {
     try {
       _products = await remote.getProducts();
     } catch (e) {
-      error = 'Erro ao carregar produtos';
+      error = 'Erro ao carregar produtos. Verifique sua conexão.';
     } finally {
       isLoading = false;
       notifyListeners();

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/datasources/product_remote_datasource.dart';
 import 'presentation/providers/favorites_provider.dart';
-import 'presentation/pages/product_page.dart';
+import 'presentation/pages/home_page.dart';
 
 void main() {
   final dio = Dio();
@@ -23,13 +23,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Product App',
+      title: 'Product Store',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4A148C)),
         useMaterial3: true,
       ),
-      home: const ProductPage(),
+      home: const HomePage(),
     );
   }
 }
