@@ -7,127 +7,121 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF4A148C), Color(0xFF7B1FA2), Color(0xFFAB47BC)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 60),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 48),
 
-                // Ícone decorativo
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(
-                    Icons.storefront_rounded,
-                    color: Colors.white,
-                    size: 40,
-                  ),
+              // Ícone
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
+                child: const Icon(
+                  Icons.storefront_outlined,
+                  color: Colors.black87,
+                  size: 28,
+                ),
+              ),
 
-                const SizedBox(height: 40),
+              const SizedBox(height: 36),
 
-                // Título principal
-                const Text(
-                  'Bem-vindo à\nProduct Store',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
+              // Título
+              const Text(
+                'Bem-vindo à\nProduct Store',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w500,
+                  height: 1.25,
+                  color: Colors.black87,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Subtítulo
+              Text(
+                'Explore nosso catálogo completo\ncom os melhores produtos.',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey[600],
+                  height: 1.6,
+                ),
+              ),
+
+              const Spacer(),
+
+              // Cards
+              Row(
+                children: [
+                  _InfoCard(
+                    icon: Icons.inventory_2_outlined,
+                    label: 'Produtos',
+                    value: '20+',
                   ),
-                ),
-
-                const SizedBox(height: 16),
-
-                Text(
-                  'Explore nosso catálogo completo\ncom os melhores produtos.',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.80),
-                    fontSize: 16,
-                    height: 1.5,
+                  const SizedBox(width: 10),
+                  _InfoCard(
+                    icon: Icons.grid_view_outlined,
+                    label: 'Categorias',
+                    value: '4',
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  _InfoCard(
+                    icon: Icons.star_outline_rounded,
+                    label: 'Avaliados',
+                    value: '100%',
+                  ),
+                ],
+              ),
 
-                const Spacer(),
+              const SizedBox(height: 36),
 
-                // Cards informativos
-                Row(
-                  children: [
-                    _InfoCard(
-                      icon: Icons.inventory_2_outlined,
-                      label: 'Produtos',
-                      value: '20+',
+              // Botão
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProductPage()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black87,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 12),
-                    _InfoCard(
-                      icon: Icons.category_outlined,
-                      label: 'Categorias',
-                      value: '4',
-                    ),
-                    const SizedBox(width: 12),
-                    _InfoCard(
-                      icon: Icons.star_outline_rounded,
-                      label: 'Avaliados',
-                      value: '100%',
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 40),
-
-                // Botão principal
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ProductPage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF4A148C),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Ver Produtos',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Ver produtos',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward_rounded, size: 20),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward_rounded, size: 18),
+                    ],
                   ),
                 ),
+              ),
 
-                const SizedBox(height: 48),
-              ],
-            ),
+              const SizedBox(height: 40),
+            ],
           ),
         ),
       ),
@@ -150,31 +144,28 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.20)),
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
         ),
         child: Column(
           children: [
-            Icon(icon, color: Colors.white, size: 24),
+            Icon(icon, color: Colors.grey[600], size: 20),
             const SizedBox(height: 8),
             Text(
               value,
               style: const TextStyle(
-                color: Colors.white,
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               label,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.70),
-                fontSize: 11,
-              ),
+              style: TextStyle(fontSize: 11, color: Colors.grey[500]),
             ),
           ],
         ),

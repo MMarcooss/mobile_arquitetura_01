@@ -2,16 +2,27 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/datasources/product_remote_datasource.dart';
+import 'data/datasources/productcachedatasource.dart';
+import 'data/repositories/product_repositoryimpl.dart';
 import 'presentation/providers/favorites_provider.dart';
 import 'presentation/pages/home_page.dart';
 
 void main() {
-  final dio = Dio();
-  final datasource = ProductRemoteDatasource(dio);
+  final dio = Dio(
+    BaseOptions(
+      validateStatus: (_) => true,
+      headers: {
+        'Accept': 'application/json',
+      },
+    ),
+  );
+  final remoteDatasource = ProductRemoteDatasource(dio);
+  final cacheDatasource = ProductCacheDatasource();
+  final repository = ProductRepositoryImpl(remoteDatasource, cacheDatasource);
 
   runApp(
     ChangeNotifierProvider(
-      create: (_) => FavoritesProvider(datasource),
+      create: (_) => FavoritesProvider(repository),
       child: const MyApp(),
     ),
   );

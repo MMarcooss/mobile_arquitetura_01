@@ -34,4 +34,16 @@ class ProductModel {
       ratingCount: (rating["count"] as num?)?.toInt() ?? 0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "title": title,
+      "price": price,
+      "image": image,
+      "description": description,
+      "category": category,
+      "rating": {"rate": ratingRate, "count": ratingCount},
+    };
+  }
 }

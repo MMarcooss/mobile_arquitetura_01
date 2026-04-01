@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/favorites_provider.dart';
 import '../../data/models/product_model.dart';
 import 'product_detail_page.dart';
+import 'product_form_page.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({super.key});
@@ -21,29 +22,50 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Produtos',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
         ),
-        backgroundColor: const Color(0xFF4A148C),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
         elevation: 0,
+        scrolledUnderElevation: 1,
         actions: [
+          // Botão para adicionar novo produto
+          IconButton(
+            icon: const Icon(Icons.add_rounded, color: Colors.black87),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ProductFormPage(),
+                ),
+              );
+              // Se criou com sucesso, recarrega a lista
+              if (result == true && context.mounted) {
+                context.read<FavoritesProvider>().loadProducts();
+              }
+            },
+          ),
           Consumer<FavoritesProvider>(
             builder: (context, provider, _) {
               return Padding(
                 padding: const EdgeInsets.only(right: 16),
                 child: Row(
                   children: [
-                    const Icon(Icons.star_rounded, color: Colors.amber),
+                    Icon(Icons.star_rounded, color: Colors.amber[700], size: 20),
                     const SizedBox(width: 4),
                     Text(
                       '${provider.favoritesCount}',
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
                   ],
@@ -60,9 +82,12 @@ class _ProductPageState extends State<ProductPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Color(0xFF7B1FA2)),
+                  CircularProgressIndicator(color: Colors.black87),
                   SizedBox(height: 16),
-                  Text('Carregando produtos...'),
+                  Text(
+                    'Carregando produtos...',
+                    style: TextStyle(color: Colors.black54),
+                  ),
                 ],
               ),
             );
@@ -75,31 +100,32 @@ class _ProductPageState extends State<ProductPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.wifi_off_rounded,
                       size: 64,
-                      color: Colors.grey,
+                      color: Colors.grey[400],
                     ),
                     const SizedBox(height: 16),
                     Text(
                       provider.error!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: () => provider.loadProducts(),
-                      icon: const Icon(Icons.refresh),
+                      icon: const Icon(Icons.refresh, size: 18),
                       label: const Text('Tentar novamente'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7B1FA2),
+                        backgroundColor: Colors.black87,
                         foregroundColor: Colors.white,
+                        elevation: 0,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                     ),
@@ -110,11 +136,16 @@ class _ProductPageState extends State<ProductPage> {
           }
 
           if (provider.products.isEmpty) {
-            return const Center(child: Text('Nenhum produto encontrado.'));
+            return Center(
+              child: Text(
+                'Nenhum produto encontrado.',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
+            );
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             itemCount: provider.products.length,
             itemBuilder: (context, index) {
               final product = provider.products[index];
@@ -138,8 +169,9 @@ class _ProductPageState extends State<ProductPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.read<FavoritesProvider>().loadProducts(),
         tooltip: 'Recarregar produtos',
-        backgroundColor: const Color(0xFF7B1FA2),
+        backgroundColor: Colors.black87,
         foregroundColor: Colors.white,
+        elevation: 0,
         child: const Icon(Icons.refresh_rounded),
       ),
     );
@@ -159,30 +191,42 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      color: product.favorite ? const Color(0xFFFFF8E1) : Colors.white,
-      elevation: product.favorite ? 4 : 1,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Row(
             children: [
               // Imagem
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  color: Colors.grey[100],
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
                   child: Image.network(
                     product.image,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.image_not_supported),
+                    headers: const {'Accept': 'image/*'},
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey[100],
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey[400],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -199,22 +243,22 @@ class _ProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Text(
                           'R\$ ${product.price.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF4A148C),
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
                           ),
                         ),
                         const Spacer(),
-                        // Avaliação
                         Icon(
                           Icons.star_rounded,
                           size: 14,
@@ -224,28 +268,28 @@ class _ProductCard extends StatelessWidget {
                         Text(
                           product.ratingRate.toStringAsFixed(1),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             color: Colors.grey[600],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    // Chip de categoria
+                    const SizedBox(height: 6),
+                    // Categoria
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF7B1FA2).withOpacity(0.1),
+                        color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         product.category,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF7B1FA2),
+                          color: Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
@@ -262,8 +306,8 @@ class _ProductCard extends StatelessWidget {
                   product.favorite
                       ? Icons.star_rounded
                       : Icons.star_border_rounded,
-                  color: product.favorite ? Colors.amber : Colors.grey[400],
-                  size: 28,
+                  color: product.favorite ? Colors.amber[700] : Colors.grey[400],
+                  size: 26,
                 ),
                 onPressed: onFavoriteTap,
               ),
