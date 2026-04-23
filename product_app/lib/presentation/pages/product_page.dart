@@ -26,10 +26,7 @@ class _ProductPageState extends State<ProductPage> {
       appBar: AppBar(
         title: const Text(
           'Produtos',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w500, color: Colors.black87),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -40,16 +37,10 @@ class _ProductPageState extends State<ProductPage> {
           IconButton(
             icon: const Icon(Icons.add_rounded, color: Colors.black87),
             onPressed: () async {
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const ProductFormPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const ProductFormPage()),
               );
-              // Se criou com sucesso, recarrega a lista
-              if (result == true && context.mounted) {
-                context.read<FavoritesProvider>().loadProducts();
-              }
             },
           ),
           Consumer<FavoritesProvider>(
@@ -58,7 +49,11 @@ class _ProductPageState extends State<ProductPage> {
                 padding: const EdgeInsets.only(right: 16),
                 child: Row(
                   children: [
-                    Icon(Icons.star_rounded, color: Colors.amber[700], size: 20),
+                    Icon(
+                      Icons.star_rounded,
+                      color: Colors.amber[700],
+                      size: 20,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${provider.favoritesCount}',
@@ -306,7 +301,9 @@ class _ProductCard extends StatelessWidget {
                   product.favorite
                       ? Icons.star_rounded
                       : Icons.star_border_rounded,
-                  color: product.favorite ? Colors.amber[700] : Colors.grey[400],
+                  color: product.favorite
+                      ? Colors.amber[700]
+                      : Colors.grey[400],
                   size: 26,
                 ),
                 onPressed: onFavoriteTap,

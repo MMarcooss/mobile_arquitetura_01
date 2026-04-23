@@ -1,0 +1,131 @@
+CTRC - CONHECIMENTO DE TRANSPORTE DE CARGAS RODOVIÁRIAS
+========================================================
+
+DESCRIÇÃO:
+Documento fiscal utilizado no transporte rodoviário de cargas entre
+estados diferentes (operações interestaduais) ou dentro do mesmo
+estado (operações intrastaduais).
+
+CAMPOS PRINCIPAIS:
+------------------
+- Número do Conhecimento
+- Série
+- Data de Emissão
+- Chave de Acesso (44 dígitos quando eletrônico - CTe)
+
+DADOS DO REMETENTE:
+- Nome/Razão Social
+- CNPJ/CPF
+- Inscrição Estadual
+- Endereço Completo
+- Cidade/UF
+- CEP
+
+DADOS DO DESTINATÁRIO:
+- Nome/Razão Social
+- CNPJ/CPF
+- Inscrição Estadual
+- Endereço Completo
+- Cidade/UF
+- CEP
+
+DADOS DO TRANSPORTADOR:
+- Nome/Razão Social
+- CNPJ
+- Inscrição Estadual
+- Endereço
+- Cidade/UF
+- CEP
+- Antt (Agência Nacional de Transporte Terrestre)
+- Placa do Veículo
+
+INFORMAÇÕES DA CARGA:
+- Natureza da Carga
+- Peso Bruto (kg)
+- Peso Líquido (kg)
+- Quantidade de Volumes
+- Espécie de Volumes (caixas, pacotes, etc.)
+- Marca/Numeração
+
+VALORES:
+- Valor da Mercadoria
+- Valor do Frete
+- Valor do Seguro
+- Valor do Desconto
+- Valor Total do Serviço
+- Base de Cálculo do ICMS
+- Alíquota do ICMS
+- Valor do ICMS
+
+OBSERVAÇÕES:
+- O CTRC foi substituído pelo CTe (Conhecimento de Transporte Eletrônico)
+a partir de 2012 para operações interestaduais
+- Alguns estados ainda permitem o uso do CTRC em papel para
+operações intrastaduais
+
+================================================================================
+DIAGRAMA UML DA ARQUITETURA DO PROJETO
+================================================================================
+
+```mermaid
+flowchart TD
+    subgraph UI["📱 PRESENTATION LAYER"]
+        direction TB
+        HP[HomePage]
+        PP[ProductPage]
+        PDP[ProductDetailPage]
+        PFP[ProductFormPage]
+        FP[FavoritesProvider<br/>ChangeNotifier]
+        VM[ProductViewModel]
+        PS[ProductState]
+    end
+
+    subgraph DATA["💾 DATA LAYER"]
+        direction TB
+        REPO[ProductRepositoryImpl]
+        RDS[(ProductRemoteDatasource<br/>Dio HTTP)]
+        CDS[(ProductCacheDatasource<br/>Memória)]
+        MOD[ProductModel<br/>JSON Serializable]
+    end
+
+    subgraph DOMAIN["🎯 DOMAIN LAYER"]
+        direction TB
+        REP_INT[(ProductRepository<br/>Interface)]
+        ENT[Product Entity]
+    end
+
+    subgraph CORE["🔧 CORE"]
+        ERR[Failure<br/>Exception Handling]
+    end
+
+    %% Fluxo UI
+    HP -->|navigate| PP
+    PP -->|navigate| PDP
+    PP -->|navigate| PFP
+    PP -->|use| FP
+    FP -->|use| VM
+    VM -->|manages| PS
+
+    %% Fluxo Presentation -> Data
+    FP -->|calls| REPO
+    VM -->|calls| REPO
+
+    %% Fluxo Data
+    REPO -->|implements| REP_INT
+    REPO -->|uses| RDS
+    REPO -->|uses| CDS
+    REPO -->|uses| MOD
+    REPO -.->|throws| ERR
+
+    %% Fluxo Data -> Domain
+    MOD -->|extends| ENT
+    REP_INT -.->|returns| ENT
+
+    %% Cache sync
+    RDS -->|save to| CDS
+
+    style UI fill:#e1f5fe
+    style DATA fill:#e8f5e9
+    style DOMAIN fill:#fff3e0
+    style CORE fill:#fce4ec
+```

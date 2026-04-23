@@ -1,0 +1,305 @@
+@startuml ProductApp_ClassDiagram
+
+!define RECTANGLE class
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+skinparam class<<interface>> {
+    BackgroundColor LightYellow
+}
+
+skinparam class<<layer>> {
+    BackgroundColor LightGray
+    BorderStyle dashed
+}
+
+' =====================================================
+' CAMADA DOMAIN (Domínio)
+' =====================================================
+package "Domain Layer" <<Rectangle>> {
+
+    class Product {
+        +id: int?
+        +title: String
+        +price: double
+        +image: String
+        +description: String
+        +category: String
+        +ratingRate: double
+        +ratingCount: int
+        +Product({id, title, price, image, description, category, ratingRate, ratingCount})
+    }
+
+    interface ProductRepository {
+        +{abstract} getProducts(): Future<List<Product>>
+        +{abstract} createProduct(product: Product): Future<Product>
+        +{abstract} updateProduct(product: Product): Future<Product>
+        +{abstract} deleteProduct(id: int): Future<void>
+    }
+}
+
+' =====================================================
+' CAMADA DATA (Dados)
+' =====================================================
+package "Data Layer" <<Rectangle>> {
+
+    class ProductModel {
+        +id: int
+        +title: String
+        +price: double
+        +image: String
+        +description: String
+        +category: String
+        +ratingRate: double
+        +ratingCount: int
+        +favorite: bool
+        +ProductModel({id, title, price, image, description, category, ratingRate, ratingCount, favorite})
+        +{static} fromJson(json: Map<String, dynamic>): ProductModel
+        +toJson(): Map<String, dynamic>
+    }
+
+    class ProductRemoteDatasource {
+        -client: Dio
+        +ProductRemoteDatasource(client: Dio)
+        +getProducts(): Future<List<ProductModel>>
+        +createProduct(product: ProductModel): Future<ProductModel>
+        +updateProduct(product: ProductModel): Future<ProductModel>
+        +deleteProduct(id: int): Future<void>
+    }
+
+    class ProductCacheDatasource {
+        -_cache: List<ProductModel>?
+        +save(products: List<ProductModel>): void
+        +get(): List<ProductModel>?
+    }
+
+    class ProductRepositoryImpl {
+        -remote: ProductRemoteDatasource
+        -cache: ProductCacheDatasource
+        +ProductRepositoryImpl(remote: ProductRemoteDatasource, cache: ProductCacheDatasource)
+        +getProducts(): Future<List<Product>>
+        +createProduct(product: Product): Future<Product>
+        +updateProduct(product: Product): Future<Product>
+        +deleteProduct(id: int): Future<void>
+    }
+}
+
+' =====================================================
+' CAMADA CORE (Core/Shared)
+' =====================================================
+package "Core Layer" <<Rectangle>> {
+
+    class Failure {
+        +message: String
+        +Failure(message: String)
+        +toString(): String
+    }
+}
+
+' =====================================================
+' CAMADA PRESENTATION (Apresentação) - Providers/Controllers
+' =====================================================
+package "Presentation Layer - Providers" <<Rectangle>> {
+
+    class FavoritesProvider {
+        -_repository: ProductRepositoryImpl
+        -_products: List<ProductModel>
+        -_localProducts: List<ProductModel>
+        +isLoading: bool
+        +error: String?
+        +FavoritesProvider(repository: ProductRepositoryImpl)
+        +products: List<ProductModel>
+        +favorites: List<ProductModel>
+        +favoritesCount: int
+        +loadProducts(): Future<void>
+        +toggleFavorite(index: int): void
+        +createProduct(product: ProductModel): Future<void>
+        +updateProduct(product: ProductModel): Future<void>
+    }
+
+    class ProductViewModel {
+        -_repository: ProductRepository
+        +state: ValueNotifier<ProductState>
+        +ProductViewModel(repository: ProductRepository)
+        +loadProducts(): Future<void>
+    }
+
+    class ProductState {
+        +isLoading: bool
+        +products: List<Product>
+        +error: String?
+        +const ProductState({isLoading, products, error})
+        +copyWith({isLoading, products, error}): ProductState
+    }
+}
+
+' =====================================================
+' CAMADA PRESENTATION (Apresentação) - Pages/Telas
+' =====================================================
+package "Presentation Layer - Pages" <<Rectangle>> {
+
+    class HomePage {
+        +const HomePage({Key? key})
+        +build(context: BuildContext): Widget
+    }
+
+    class ProductPage {
+        +const ProductPage({Key? key})
+        +createState(): State<ProductPage>
+    }
+
+    class _ProductPageState {
+        -_provider: FavoritesProvider
+        +initState(): void
+        +build(context: BuildContext): Widget
+    }
+
+    class _ProductCard {
+        -product: ProductModel
+        -onFavoriteTap: VoidCallback
+        -onTap: VoidCallback
+        +const _ProductCard({product, onFavoriteTap, onTap})
+        +build(context: BuildContext): Widget
+    }
+
+    class ProductDetailPage {
+        -product: ProductModel
+        +const ProductDetailPage({Key? key, required product: ProductModel})
+        +build(context: BuildContext): Widget
+    }
+
+    class _RatingBadge {
+        -rate: double
+        -count: int
+        +const _RatingBadge({rate, count})
+        +build(context: BuildContext): Widget
+    }
+
+    class _DetailTile {
+        -icon: IconData
+        -label: String
+        -value: String
+        -isLast: bool
+        +const _DetailTile({icon, label, value, isLast})
+        +build(context: BuildContext): Widget
+    }
+
+    class ProductFormPage {
+        -product: ProductModel?
+        +const ProductFormPage({Key? key, product: ProductModel?})
+        +isEditing: bool
+        +createState(): State<ProductFormPage>
+    }
+
+    class _ProductFormPageState {
+        -_formKey: GlobalKey<FormState>
+        -_titleController: TextEditingController
+        -_priceController: TextEditingController
+        -_descriptionController: TextEditingController
+        -_imageController: TextEditingController
+        -_categoryController: TextEditingController
+        -isLoading: bool
+        +initState(): void
+        +dispose(): void
+        -_submitForm(): Future<void>
+        +build(context: BuildContext): Widget
+        -_buildField({controller, label, icon, keyboardType, maxLines, validator}): Widget
+    }
+
+    class _InfoCard {
+        -icon: IconData
+        -label: String
+        -value: String
+        +const _InfoCard({icon, label, value})
+        +build(context: BuildContext): Widget
+    }
+}
+
+' =====================================================
+' RELACIONAMENTOS - IMPLEMENTAÇÃO E HERANÇA
+' =====================================================
+ProductRepositoryImpl ..|> ProductRepository : implements
+FavoritesProvider --|> ChangeNotifier : extends
+Failure ..|> Exception : implements
+
+' =====================================================
+' RELACIONAMENTOS - ASSOCIAÇÃO (USO)
+' =====================================================
+ProductRepositoryImpl --> ProductRemoteDatasource : uses
+ProductRepositoryImpl --> ProductCacheDatasource : uses
+ProductRepositoryImpl ..> Product : creates/returns
+ProductRepositoryImpl ..> ProductModel : converts
+ProductRepositoryImpl ..> Failure : throws
+
+ProductRemoteDatasource ..> ProductModel : creates/returns
+ProductCacheDatasource ..> ProductModel : stores
+
+FavoritesProvider --> ProductRepositoryImpl : uses
+FavoritesProvider ..> ProductModel : manages
+FavoritesProvider ..> Product : converts
+
+ProductViewModel --> ProductRepository : uses
+ProductViewModel --> ProductState : manages
+
+ProductState ..> Product : contains
+
+' =====================================================
+' RELACIONAMENTOS - COMPOSIÇÃO/AGREGAÇÃO
+' =====================================================
+ProductPage *-- _ProductPageState : composes
+ProductPage *-- _ProductCard : composes
+ProductDetailPage *-- _RatingBadge : composes
+ProductDetailPage *-- _DetailTile : composes
+ProductFormPage *-- _ProductFormPageState : composes
+HomePage *-- _InfoCard : composes
+
+' =====================================================
+' RELACIONAMENTOS - DEPENDÊNCIA (Navegação)
+' =====================================================
+HomePage ..> ProductPage : navigates to
+ProductPage ..> ProductDetailPage : navigates to
+ProductPage ..> ProductFormPage : navigates to
+ProductDetailPage ..> ProductFormPage : navigates to
+
+' =====================================================
+' RELACIONAMENTOS - USO EM TELAS
+' =====================================================
+ProductPage ..> FavoritesProvider : uses
+ProductFormPage ..> FavoritesProvider : uses
+ProductDetailPage ..> ProductModel : receives
+_ProductCard ..> ProductModel : receives
+_ProductFormPageState ..> ProductModel : creates
+
+' =====================================================
+' NOTAS SOBRE CAMADAS
+' =====================================================
+note right of Product
+    **Domain Layer**
+    Entidade principal do domínio
+    Contém regras de negócio puras
+end note
+
+note right of ProductModel
+    **Data Layer**
+    Modelo com serialização JSON
+    Extende a entidade com campo 'favorite'
+end note
+
+note right of FavoritesProvider
+    **Presentation Layer**
+    Gerencia estado com ChangeNotifier
+    Comunica com repository
+end note
+
+note right of Failure
+    **Core Layer**
+    Exceção customizada para
+    tratamento de erros
+end note
+
+@enduml

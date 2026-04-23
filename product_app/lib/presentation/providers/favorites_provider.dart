@@ -24,9 +24,8 @@ class FavoritesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Busca produtos da API (ou cache se offline)
       final productsFromRepo = await repository.getProducts();
-      // Converte Product (entidade) para ProductModel
+
       _products = productsFromRepo
           .map(
             (p) => ProductModel(
@@ -45,7 +44,7 @@ class FavoritesProvider extends ChangeNotifier {
       // Adiciona produtos locais que foram criados (merge)
       for (var local in _localProducts) {
         if (!_products.any((p) => p.id == local.id)) {
-          _products.add(local);
+          _products.insert(0, local);
         }
       }
     } catch (e) {
@@ -74,19 +73,19 @@ class FavoritesProvider extends ChangeNotifier {
         ratingRate: product.ratingRate,
         ratingCount: product.ratingCount,
       );
-      // Chama o repository que usa cache
+
       final created = await repository.createProduct(productEntity);
       final createdModel = ProductModel(
-        id: created.id ?? 0,
-        title: created.title,
-        price: created.price,
-        image: created.image,
-        description: created.description,
-        category: created.category,
-        ratingRate: created.ratingRate,
-        ratingCount: created.ratingCount,
+        id: DateTime.now().millisecondsSinceEpoch, // ← ID único local
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        description: product.description,
+        category: product.category,
+        ratingRate: product.ratingRate,
+        ratingCount: product.ratingCount,
       );
-      _products.add(createdModel);
+      _products.insert(0, createdModel);
       _localProducts.add(createdModel); // Mantém localmente
       notifyListeners();
     } catch (e) {
