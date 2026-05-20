@@ -29,19 +29,18 @@ class FavoritesProvider extends ChangeNotifier {
       _products = productsFromRepo
           .map(
             (p) => ProductModel(
-              id: p.id ?? 0,
+              id: p.id,
               title: p.title,
               price: p.price,
-              image: p.image,
+              image: p.thumbnail, // Entidade (thumbnail) -> Model (image)
               description: p.description,
               category: p.category,
-              ratingRate: p.ratingRate,
-              ratingCount: p.ratingCount,
+              ratingRate: p.rating, // Entidade (rating) -> Model (ratingRate)
+              ratingCount: 0, // Valor padrão
             ),
           )
           .toList();
 
-      // Adiciona produtos locais que foram criados (merge)
       for (var local in _localProducts) {
         if (!_products.any((p) => p.id == local.id)) {
           _products.insert(0, local);
@@ -62,31 +61,32 @@ class FavoritesProvider extends ChangeNotifier {
 
   Future<void> createProduct(ProductModel product) async {
     try {
-      // Converte ProductModel para Product (entidade)
       final productEntity = Product(
         id: product.id,
         title: product.title,
         price: product.price,
-        image: product.image,
+        thumbnail: product.image, // Model (image) -> Entidade (thumbnail)
         description: product.description,
         category: product.category,
-        ratingRate: product.ratingRate,
-        ratingCount: product.ratingCount,
+        rating: product.ratingRate, // Model (ratingRate) -> Entidade (rating)
+        stock: 0,
       );
 
       final created = await repository.createProduct(productEntity);
+
       final createdModel = ProductModel(
-        id: DateTime.now().millisecondsSinceEpoch, // ← ID único local
-        title: product.title,
-        price: product.price,
-        image: product.image,
-        description: product.description,
-        category: product.category,
-        ratingRate: product.ratingRate,
-        ratingCount: product.ratingCount,
+        id: DateTime.now().millisecondsSinceEpoch,
+        title: created.title,
+        price: created.price,
+        image: created.thumbnail,
+        description: created.description,
+        category: created.category,
+        ratingRate: created.rating,
+        ratingCount: 0,
       );
+
       _products.insert(0, createdModel);
-      _localProducts.add(createdModel); // Mantém localmente
+      _localProducts.add(createdModel);
       notifyListeners();
     } catch (e) {
       error = 'Erro ao cadastrar produto.';
@@ -96,32 +96,33 @@ class FavoritesProvider extends ChangeNotifier {
 
   Future<void> updateProduct(ProductModel product) async {
     try {
-      // Converte ProductModel para Product (entidade)
       final productEntity = Product(
         id: product.id,
         title: product.title,
         price: product.price,
-        image: product.image,
+        thumbnail: product.image,
         description: product.description,
         category: product.category,
-        ratingRate: product.ratingRate,
-        ratingCount: product.ratingCount,
+        rating: product.ratingRate,
+        stock: 0,
       );
+
       final updated = await repository.updateProduct(productEntity);
+
       final updatedModel = ProductModel(
-        id: updated.id ?? 0,
+        id: updated.id,
         title: updated.title,
         price: updated.price,
-        image: updated.image,
+        image: updated.thumbnail,
         description: updated.description,
         category: updated.category,
-        ratingRate: updated.ratingRate,
-        ratingCount: updated.ratingCount,
+        ratingRate: updated.rating,
+        ratingCount: 0,
       );
+
       final index = _products.indexWhere((p) => p.id == updated.id);
       if (index != -1) {
         _products[index] = updatedModel;
-        // Atualiza também na lista local
         final localIndex = _localProducts.indexWhere((p) => p.id == updated.id);
         if (localIndex != -1) {
           _localProducts[localIndex] = updatedModel;

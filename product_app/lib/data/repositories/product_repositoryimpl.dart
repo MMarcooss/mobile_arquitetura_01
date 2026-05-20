@@ -15,37 +15,11 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       final models = await remote.getProducts();
       cache.save(models);
-      return models
-          .map(
-            (m) => Product(
-              id: m.id,
-              title: m.title,
-              price: m.price,
-              image: m.image,
-              description: m.description,
-              category: m.category,
-              ratingRate: m.ratingRate,
-              ratingCount: m.ratingCount,
-            ),
-          )
-          .toList();
+      return models.map((m) => _toEntity(m)).toList();
     } catch (e) {
       final cached = cache.get();
       if (cached != null) {
-        return cached
-            .map(
-              (m) => Product(
-                id: m.id,
-                title: m.title,
-                price: m.price,
-                image: m.image,
-                description: m.description,
-                category: m.category,
-                ratingRate: m.ratingRate,
-                ratingCount: m.ratingCount,
-              ),
-            )
-            .toList();
+        return cached.map((m) => _toEntity(m)).toList();
       }
       throw Failure("Não foi possível carregar os produtos");
     }
@@ -54,28 +28,9 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Product> createProduct(Product product) async {
     try {
-      final model = await remote.createProduct(
-        ProductModel(
-          id: product.id ?? 0,
-          title: product.title,
-          price: product.price,
-          image: product.image,
-          description: product.description,
-          category: product.category,
-          ratingRate: product.ratingRate,
-          ratingCount: product.ratingCount,
-        ),
-      );
-      return Product(
-        id: model.id,
-        title: model.title,
-        price: model.price,
-        image: model.image,
-        description: model.description,
-        category: model.category,
-        ratingRate: model.ratingRate,
-        ratingCount: model.ratingCount,
-      );
+      // Converte Entidade para Model para enviar ao Remote
+      final model = await remote.createProduct(_toModel(product));
+      return _toEntity(model);
     } catch (e) {
       throw Failure("Não foi possível criar o produto");
     }
@@ -84,28 +39,8 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Product> updateProduct(Product product) async {
     try {
-      final model = await remote.updateProduct(
-        ProductModel(
-          id: product.id ?? 0,
-          title: product.title,
-          price: product.price,
-          image: product.image,
-          description: product.description,
-          category: product.category,
-          ratingRate: product.ratingRate,
-          ratingCount: product.ratingCount,
-        ),
-      );
-      return Product(
-        id: model.id,
-        title: model.title,
-        price: model.price,
-        image: model.image,
-        description: model.description,
-        category: model.category,
-        ratingRate: model.ratingRate,
-        ratingCount: model.ratingCount,
-      );
+      final model = await remote.updateProduct(_toModel(product));
+      return _toEntity(model);
     } catch (e) {
       throw Failure("Não foi possível atualizar o produto");
     }
@@ -119,4 +54,28 @@ class ProductRepositoryImpl implements ProductRepository {
       throw Failure("Não foi possível deletar o produto");
     }
   }
-}
+
+  // Mapper: Model -> Entity
+  Product _toEntity(ProductModel m) => Product(
+    id: m.id,
+    title: m.title,
+    description: m.description,
+    category: m.category,
+    price: m.price,
+    rating: m.ratingRate, // Mapeia ratingRate para rating
+    stock: 0, // Model não tem stock, definimos um padrão
+    thumbnail: m.image, // Mapeia image para thumbnail
+  );
+
+  // Mapper: Entity -> Model
+  ProductModel _toModel(Product p) => ProductModel(
+    id: p.id,
+    title: p.title,
+    price: p.price,
+    image: p.thumbnail, // Mapeia thumbnail para image
+    description: p.description,
+    category: p.category,
+    ratingRate: p.rating, // Mapeia rating para ratingRate
+    ratingCount: 0,
+  );
+}    // Entity
