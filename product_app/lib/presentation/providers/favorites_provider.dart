@@ -9,7 +9,7 @@ class FavoritesProvider extends ChangeNotifier {
   FavoritesProvider(this.repository);
 
   List<ProductModel> _products = [];
-  List<ProductModel> _localProducts = [];
+  final List<ProductModel> _localProducts = [];
   bool isLoading = false;
   String? error;
 
